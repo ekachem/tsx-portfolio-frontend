@@ -27,49 +27,30 @@ const emailLoginButton = document.getElementById('emailLoginButton');
 
 loginButton.addEventListener('click', () => {
   signInWithPopup(auth, provider)
-    .catch(error => showError('Google login error: ' + error.message));
+    .then(result => console.log('Google login:', result.user.email))
+    .catch(error => console.error('Google login error:', error.message));
 });
 
 registerButton.addEventListener('click', () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    showError('Please enter email and password to register.');
-    return;
-  }
-
+  const email = emailInput.value;
+  const password = passwordInput.value;
   createUserWithEmailAndPassword(auth, email, password)
-    .then(userCredential => {
-      showMessage(`Registered & logged in as ${userCredential.user.email}`);
-    })
-    .catch(error => showError('Register error: ' + error.message));
+    .then(userCredential => console.log('Registered:', userCredential.user.email))
+    .catch(error => console.error('Register error:', error.message));
 });
 
 emailLoginButton.addEventListener('click', () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    showError('Please enter email and password to login.');
-    return;
-  }
-
+  const email = emailInput.value;
+  const password = passwordInput.value;
   signInWithEmailAndPassword(auth, email, password)
-    .then(userCredential => {
-      showMessage(`Logged in as ${userCredential.user.email}`);
-    })
-    .catch(error => showError('Email login error: ' + error.message));
+    .then(userCredential => console.log('Email login:', userCredential.user.email))
+    .catch(error => console.error('Email login error:', error.message));
 });
 
 logoutButton.addEventListener('click', () => {
   signOut(auth)
-    .then(() => {
-      showMessage('Logged out');
-      portfolioList.innerHTML = '';
-      analysisResult.textContent = '';
-    })
-    .catch(error => showError('Logout error: ' + error.message));
+    .then(() => console.log('Logged out'))
+    .catch(error => console.error('Logout error:', error.message));
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -105,9 +86,10 @@ onAuthStateChanged(auth, async (user) => {
           body: JSON.stringify(portfolioArray)
         });
         const result = await response.json();
-        analysisResult.textContent = `Portfolio Value: $${result.latest_value}, Growth: ${result.growth}%`;
+        analysisResult.textContent = `Value: $${result.latest_value}, Growth: ${result.growth}%`;
       } catch (error) {
-        showError('Analysis error: ' + error.message);
+        analysisResult.textContent = 'Analysis failed.';
+        console.error(error);
       }
     });
 
@@ -118,12 +100,4 @@ onAuthStateChanged(auth, async (user) => {
     portfolioSection.style.display = 'none';
   }
 });
-
-function showMessage(message) {
-  userInfo.textContent = message;
-}
-
-function showError(errorMessage) {
-  userInfo.textContent = `❌ ${errorMessage}`;
-}
 
