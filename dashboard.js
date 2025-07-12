@@ -25,6 +25,41 @@ const passwordInput = document.getElementById('passwordInput');
 const registerButton = document.getElementById('registerButton');
 const emailLoginButton = document.getElementById('emailLoginButton');
 
+
+
+const tickerInput = document.getElementById('tickerInput');
+const sharesInput = document.getElementById('sharesInput');
+const buyPriceInput = document.getElementById('buyPriceInput');
+const addStockButton = document.getElementById('addStockButton');
+
+addStockButton.addEventListener('click', async () => {
+  const ticker = tickerInput.value.trim();
+  const shares = Number(sharesInput.value);
+  const buyPrice = Number(buyPriceInput.value);
+
+  if (!ticker || shares <= 0 || buyPrice <= 0) {
+    showError('Please enter valid ticker, shares, and buy price.');
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, 'users', auth.currentUser.uid, 'portfolio'), {
+      ticker: ticker.toUpperCase(),
+      shares,
+      buy_price: buyPrice,
+      date: new Date().toISOString().split('T')[0]
+    });
+    showMessage('Stock added! Please reload to see updates.');
+    tickerInput.value = '';
+    sharesInput.value = '';
+    buyPriceInput.value = '';
+  } catch (error) {
+    showError('Add stock error: ' + error.message);
+  }
+});
+
+
+
 loginButton.addEventListener('click', () => {
   signInWithPopup(auth, provider)
     .catch(error => showError('Google login error: ' + error.message));
