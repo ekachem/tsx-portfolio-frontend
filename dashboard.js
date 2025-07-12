@@ -10,6 +10,14 @@ import {
   addDoc
 } from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js';
 
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from 'https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js';
+
 const loginButton = document.getElementById('loginButton');
 const logoutButton = document.getElementById('logoutButton');
 const userInfo = document.getElementById('userInfo');
@@ -21,6 +29,37 @@ const tickerInput = document.getElementById('tickerInput');
 const sharesInput = document.getElementById('sharesInput');
 const buyPriceInput = document.getElementById('buyPriceInput');
 const addStockButton = document.getElementById('addStockButton');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const registerButton = document.getElementById('registerButton');
+const emailLoginButton = document.getElementById('emailLoginButton');
+
+
+registerButton.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(userCredential => {
+      console.log('Registered:', userCredential.user.email);
+    })
+    .catch(error => {
+      console.error('Registration error:', error.message);
+    });
+});
+
+emailLoginButton.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(userCredential => {
+      console.log('Logged in:', userCredential.user.email);
+    })
+    .catch(error => {
+      console.error('Login error:', error.message);
+    });
+});
 
 loginButton.addEventListener('click', () => {
   signInWithPopup(auth, provider)
