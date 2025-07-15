@@ -65,6 +65,22 @@ logoutButton.addEventListener('click', () => {
     .catch(error => showError('Logout error: ' + error.message));
 });
 
+async function loadPortfolio() {
+  const portfolioSnapshot = await getDocs(collection(db, 'users', auth.currentUser.uid, 'portfolio'));
+  portfolioList.innerHTML = '';
+  portfolioSnapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    portfolioList.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between align-items-center" data-id="${docSnap.id}">
+        <span>${data.ticker}: ${data.shares} shares @ $${data.buy_price}</span>
+        <div>
+          <button class="btn btn-sm btn-warning edit-btn me-2">Edit</button>
+          <button class="btn btn-sm btn-danger delete-btn">Delete</button>
+        </div>
+      </li>`;
+  });
+}
+
 addStockButton.addEventListener('click', async () => {
   const ticker = tickerInput.value.trim();
   const shares = Number(sharesInput.value);
