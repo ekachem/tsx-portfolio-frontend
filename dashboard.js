@@ -142,6 +142,7 @@ portfolioList.addEventListener('click', async (e) => {
           shares: Number(newShares)
         });
         showMessage('Stock updated! Please reload to see changes.');
+	await loadPortfolio();
       } catch (error) {
         showError('Edit error: ' + error.message);
       }
@@ -153,6 +154,7 @@ portfolioList.addEventListener('click', async (e) => {
       try {
         await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'portfolio', docId));
         showMessage('Stock deleted! Please reload to see changes.');
+	await loadPortfolio();
       } catch (error) {
         showError('Delete error: ' + error.message);
       }
