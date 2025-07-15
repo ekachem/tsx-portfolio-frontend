@@ -77,7 +77,8 @@ addStockButton.addEventListener('click', async () => {
       buy_price: buyPrice,
       date: new Date().toISOString().split('T')[0]
     });
-    showMessage('Stock added! Please reload to see updates.');
+    showMessage('Stock added! You should be able to see instant addition now!');
+    await loadPortfolio();
     tickerInput.value = '';
     sharesInput.value = '';
     buyPriceInput.value = '';
