@@ -65,6 +65,28 @@ logoutButton.addEventListener('click', () => {
     .catch(error => showError('Logout error: ' + error.message));
 });
 
+addStockButton.addEventListener('click', async () => {
+  const ticker = tickerInput.value.trim();
+  const shares = Number(sharesInput.value);
+  const buyPrice = Number(buyPriceInput.value);
+  if (!ticker || shares <= 0 || buyPrice <= 0) return showError('Please enter valid ticker, shares, and buy price.');
+  try {
+    await addDoc(collection(db, 'users', auth.currentUser.uid, 'portfolio'), {
+      ticker: ticker.toUpperCase(),
+      shares,
+      buy_price: buyPrice,
+      date: new Date().toISOString().split('T')[0]
+    });
+    showMessage('Stock added!');
+    await loadPortfolio();
+    tickerInput.value = '';
+    sharesInput.value = '';
+    buyPriceInput.value = '';
+  } catch (error) {
+    showError('Add stock error: ' + error.message);
+  }
+});
+
 async function loadPortfolio() {
   const portfolioSnapshot = await getDocs(collection(db, 'users', auth.currentUser.uid, 'portfolio'));
   portfolioList.innerHTML = '';
@@ -81,54 +103,6 @@ async function loadPortfolio() {
   });
 }
 
-addStockButton.addEventListener('click', async () => {
-  const ticker = tickerInput.value.trim();
-  const shares = Number(sharesInput.value);
-  const buyPrice = Number(buyPriceInput.value);
-  if (!ticker || shares <= 0 || buyPrice <= 0) return showError('Please enter valid ticker, shares, and buy price.');
-  try {
-    await addDoc(collection(db, 'users', auth.currentUser.uid, 'portfolio'), {
-      ticker: ticker.toUpperCase(),
-      shares,
-      buy_price: buyPrice,
-      date: new Date().toISOString().split('T')[0]
-    });
-    showMessage('Stock added! You should be able to see instant addition now!');
-    await loadPortfolio();
-    tickerInput.value = '';
-    sharesInput.value = '';
-    buyPriceInput.value = '';
-  } catch (error) {
-    showError('Add stock error: ' + error.message);
-  }
-});
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    userInfo.textContent = `Logged in as ${user.email}`;
-    loginButton.style.display = 'none';
-    logoutButton.style.display = 'inline';
-    portfolioSection.style.display = 'block';
-
-    const portfolioSnapshot = await getDocs(collection(db, 'users', user.uid, 'portfolio'));
-    portfolioList.innerHTML = '';
-    portfolioSnapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      portfolioList.innerHTML += `
-        <li data-id="${docSnap.id}">
-          ${data.ticker}: ${data.shares} shares @ $${data.buy_price}
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </li>`;
-    });
-  } else {
-    userInfo.textContent = 'Not logged in';
-    loginButton.style.display = 'inline';
-    logoutButton.style.display = 'none';
-    portfolioSection.style.display = 'none';
-  }
-});
-
 portfolioList.addEventListener('click', async (e) => {
   const li = e.target.closest('li');
   if (!li) return;
@@ -141,8 +115,8 @@ portfolioList.addEventListener('click', async (e) => {
         await updateDoc(doc(db, 'users', auth.currentUser.uid, 'portfolio', docId), {
           shares: Number(newShares)
         });
-        showMessage('Stock updated! Please reload to see changes.');
-	await loadPortfolio();
+        showMessage('Stock updated!');
+        await loadPortfolio();
       } catch (error) {
         showError('Edit error: ' + error.message);
       }
@@ -153,8 +127,8 @@ portfolioList.addEventListener('click', async (e) => {
     if (confirm('Are you sure you want to delete this stock?')) {
       try {
         await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'portfolio', docId));
-        showMessage('Stock deleted! Please reload to see changes.');
-	await loadPortfolio();
+        showMessage('Stock deleted!');
+        await loadPortfolio();
       } catch (error) {
         showError('Delete error: ' + error.message);
       }
@@ -190,6 +164,21 @@ analyzeButton.addEventListener('click', async () => {
     }
   } catch (error) {
     showError('Analysis error: ' + error.message);
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    userInfo.textContent = `Logged in as ${user.email}`;
+    loginButton.style.display = 'none';
+    logoutButton.style.display = 'inline';
+    portfolioSection.style.display = 'block';
+    await loadPortfolio();
+  } else {
+    userInfo.textContent = 'Not logged in';
+    loginButton.style.display = 'inline';
+    logoutButton.style.display = 'none';
+    portfolioSection.style.display = 'none';
   }
 });
 
