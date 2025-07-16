@@ -160,7 +160,11 @@ analyzeButton.addEventListener('click', async () => {
     if (result.error) {
       showError('Backend error: ' + result.error);
     } else {
-      analysisResult.textContent = `Portfolio Value: $${result.latest_value}, Growth: ${result.growth}%`;
+      analysisResult.innerHTML = `
+  Initial Investment: $${result.initial_value}<br>
+  Current Portfolio Value: $${result.latest_value}<br>
+  Growth: ${result.growth}%`;
+
     }
   } catch (error) {
     showError('Analysis error: ' + error.message);
