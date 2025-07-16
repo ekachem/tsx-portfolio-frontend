@@ -55,13 +55,19 @@
         </div>
       </div>
 
-      <!-- Portfolio List -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5>Your Portfolio</h5>
+    <!-- Portfolio List inside a collapsible -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5>
+          <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#portfolioCollapse" aria-expanded="false" aria-controls="portfolioCollapse">
+            Your Portfolio ▼
+          </button>
+        </h5>
+        <div class="collapse" id="portfolioCollapse">
           <ul class="list-group" id="portfolioList"></ul>
         </div>
       </div>
+    </div>
 
       <!-- Analyze Portfolio -->
       <div class="card mb-4">
